@@ -74,4 +74,29 @@ body {
 img {
     max-width: 100%;
     height: auto;
+
+}
+footer {
+    /* Sayfa içeriği az olsa bile footer'ın altta durmasına yardımcı olur */
+    margin-top: auto;
+}
+
+footer a {
+    position: relative;
+    display: inline-block;
+}
+
+footer a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--gold);
+    transition: width 0.3s ease;
+}
+
+footer a:hover::after {
+    width: 100%;
 }
