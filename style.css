@@ -1,0 +1,77 @@
+:root { 
+    --gold: #B38B59; 
+    --cream: #FDFBF7; 
+    --dark: #1c1917;
+}
+
+body { 
+    background-color: var(--cream); 
+    font-family: 'Montserrat', sans-serif;
+    color: var(--dark);
+    scroll-behavior: smooth;
+}
+
+.font-serif { font-family: 'Cormorant Garamond', serif; }
+
+/* Yumuşak geçiş efekti */
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--gold); }
+
+#drop-zone.active { 
+    border-color: var(--gold); 
+    background-color: rgba(179, 139, 89, 0.05); 
+}
+/* Mobil Uyumluluk Ayarları */
+@media (max-width: 768px) {
+    /* Navigasyon: Mobilde dikey veya daha sade */
+    nav {
+        flex-direction: column;
+        padding: 1rem !important;
+        height: auto !important;
+        position: relative !important;
+    }
+    
+    nav .flex {
+        margin-top: 15px;
+        gap: 15px !important;
+    }
+
+    /* Yazı boyutlarını küçült */
+    h1 { font-size: 1.8rem !important; }
+    h2 { font-size: 2.5rem !important; }
+    
+    /* Hero bölümü (Giriş resmi) yüksekliğini ayarla */
+    header { height: 60vh !important; }
+
+    /* Izgara yapısını mobilde tek sütuna düşür */
+    .grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+
+    /* Admin paneli mobilde yan yana değil alt alta olsun */
+    #panel-content {
+        flex-direction: column;
+    }
+    
+    aside {
+        width: 100% !important;
+        height: auto !important;
+        padding: 20px !important;
+    }
+}
+
+/* Görsellerin taşmasını engelle */
+img {
+    max-width: 100%;
+    height: auto;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>La Carte | L'Art du Sucre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,400&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-[#FDFBF7]">
+    <nav class="py-8 px-12 flex justify-between items-center bg-white border-b border-stone-100">
+        <div class="flex space-x-10 text-[11px] uppercase tracking-[0.2em]">
+            <a href="index.html">Accueil</a>
+            <a href="carte.html" class="font-bold border-b border-amber-700">La Carte</a>
+        </div>
+        <h1 class="text-3xl font-serif italic uppercase">L'Art du Sucre</h1>
+        <div class="flex space-x-10 text-[11px] uppercase tracking-[0.2em]">
+            <a href="histoire.html">Histoire</a>
+            <a href="trouver.html">Contact</a>
+        </div>
+    </nav>
+
+    <main class="py-20 max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-6xl font-serif italic mb-4">La Carte</h2>
+            <div class="flex justify-center space-x-8 text-[10px] uppercase tracking-[0.3em] text-stone-500">
+                <button onclick="renderCustomerMenu('All')" class="hover:text-amber-700 transition focus:text-amber-700">Tümü</button>
+                <button onclick="renderCustomerMenu('Pâtisseries')" class="hover:text-amber-700 transition focus:text-amber-700">Pastalar</button>
+                <button onclick="renderCustomerMenu('Macarons')" class="hover:text-amber-700 transition focus:text-amber-700">Makaronlar</button>
+                <button onclick="renderCustomerMenu('Viennoiserie')" class="hover:text-amber-700 transition focus:text-amber-700">Hamur İşleri</button>
+            </div>
+        </div>
+        
+        <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-16">
+            </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

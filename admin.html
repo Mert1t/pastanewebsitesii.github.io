@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Chef | L'Art du Sucre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-stone-100">
+    <div id="admin-login" class="fixed inset-0 bg-stone-900 z-[100] flex items-center justify-center">
+        <div class="bg-white p-12 text-center shadow-2xl max-w-sm w-full">
+            <h3 class="text-2xl mb-8 font-serif italic">Accès Chef</h3>
+            <input type="password" id="admin-password" placeholder="Mot de passe" class="border-b w-full p-3 mb-8 outline-none text-center focus:border-amber-700 transition">
+            <button onclick="checkPassword()" class="w-full bg-black text-white py-3 text-[10px] uppercase tracking-widest hover:bg-stone-800 transition">Se Connecter</button>
+        </div>
+    </div>
+
+    <div id="panel-content" class="hidden flex h-screen">
+        <aside class="w-64 bg-stone-900 text-white p-8 space-y-8 shadow-xl">
+            <h2 class="text-xl font-serif italic border-b border-stone-700 pb-4 text-amber-500">Tableau de Bord</h2>
+            <nav class="space-y-4">
+                <button onclick="showAdminTab('list')" class="block text-[10px] uppercase tracking-widest hover:text-amber-500 transition">Liste des Produits</button>
+                <button onclick="showAdminTab('add')" class="block text-[10px] uppercase tracking-widest hover:text-amber-500 transition">Ajouter un Produit</button>
+            </nav>
+            <a href="index.html" class="block text-[10px] uppercase tracking-widest text-red-400 pt-20 italic">Déconnexion</a>
+        </aside>
+
+        <main class="flex-1 p-16 overflow-y-auto bg-stone-50">
+            <div id="admin-list" class="admin-tab">
+                <h2 class="text-4xl font-serif mb-10">Catalogue des Produits</h2>
+                <div id="admin-table-content" class="grid gap-4"></div>
+            </div>
+
+            <div id="admin-add" class="admin-tab hidden">
+                <h2 class="text-4xl font-serif mb-10">Nouvelle Création</h2>
+                <form id="add-form" class="max-w-xl bg-white p-10 shadow-sm space-y-6">
+                    <input type="text" id="p-name" placeholder="Nom du Produit" class="w-full border-b py-3 outline-none focus:border-amber-700" required>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <input type="number" id="p-price" placeholder="Prix (ex: 45.00)" step="0.01" min="0" class="border-b py-3 outline-none focus:border-amber-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" required>
+                        <select id="p-unit" class="border-b py-3 bg-transparent outline-none">
+                            <option value="Pièce">Pièce (Adet)</option>
+                            <option value="Kg">Kg</option>
+                            <option value="Portion">Portion</option>
+                        </select>
+                    </div>
+
+                    <select id="p-category" class="w-full border-b py-3 bg-transparent outline-none">
+                        <option value="Pâtisseries">Pâtisseries</option>
+                        <option value="Macarons">Macarons</option>
+                        <option value="Viennoiserie">Viennoiserie</option>
+                        <option value="Boissons">Boissons</option>
+                    </select>
+
+                    <div id="drop-zone" class="border-2 border-dashed border-stone-200 p-12 text-center cursor-pointer hover:border-amber-700 transition group relative">
+                        <div id="preview-container" class="hidden absolute inset-0 bg-white p-2">
+                            <img id="preview-img" class="w-full h-full object-contain">
+                        </div>
+                        <p id="drop-text" class="text-stone-400 text-sm uppercase tracking-widest group-hover:text-amber-700">Glissez ou Cliquez pour l'Image</p>
+                    </div>
+                    <input type="file" id="p-file" class="hidden" accept="image/*">
+                    
+                    <button type="submit" class="w-full bg-stone-900 text-white py-4 text-[10px] uppercase tracking-[0.2em] hover:bg-amber-800 transition">Enregistrer le Produit</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
