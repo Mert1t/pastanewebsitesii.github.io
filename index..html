@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Çiftlik Bulut Yönetim Paneli</title>
+    <style>
+        :root {
+            --primary: #1b4332;
+            --primary-light: #2d6a4f;
+            --accent: #40916c;
+            --mint: #74c69d;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 14px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        header { background: white; padding: 16px 18px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; border-left: 6px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .header-title h1 { font-size: 19px; font-weight: 800; color: var(--primary); }
+        .header-title p { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; }
+
+        .summary-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+        @media (min-width: 768px) { .summary-bar { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+        .summary-card { background: white; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .summary-card span { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .summary-card h2 { font-size: 18px; font-weight: 800; margin-top: 4px; }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--danger); }
+        .text-primary { color: var(--primary); }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .section-header h2 { font-size: 16px; font-weight: 700; color: var(--primary); }
+
+        .field-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 600px) { .field-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; } }
+
+        .field-card { 
+            background: white; 
+            border-radius: 14px; 
+            padding: 18px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            align-items: center; 
+            text-align: center;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+            cursor: pointer; 
+            transition: transform 0.2s;
+            min-height: 190px;
+        }
+        .field-card:active { transform: scale(0.98); }
+
+        .field-card .card-top { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .badge-pancar { background: #fce7f3; color: #9d174d; }
+        .badge-nohut { background: #fef3c7; color: #92400e; }
+        .badge-ekin { background: #fef08a; color: #854d0e; }
+        .badge-arpa { background: #e0e7ff; color: #3730a3; }
+        .badge-kira { background: #dbeafe; color: #1e40af; }
+        .badge-nadas { background: #f3f4f6; color: #4b5563; }
+
+        .field-card .field-name-center { font-size: 19px; font-weight: 800; color: var(--primary); margin: 12px 0 6px 0; }
+        .field-card .field-size { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .field-card .card-bottom { width: 100%; font-size: 12px; font-weight: 700; color: var(--primary-light); background: #f0fdf4; padding: 7px 10px; border-radius: 8px; margin-top: 12px; }
+
+        .add-field-card {
+            background: #fafafa;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            min-height: 190px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .add-field-card .icon { font-size: 32px; margin-bottom: 6px; }
+        .add-field-card span { font-weight: 700; font-size: 14px; }
+
+        .btn { padding: 8px 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-main); }
+
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0, 0, 0, 0.6); 
+            display: none; 
+            justify-content: center; 
+            align-items: flex-end; 
+            z-index: 1000;
+        }
+        @media (min-width: 768px) {
+            .modal-overlay { align-items: center; padding: 20px; }
+            .modal-container { border-radius: 18px !important; max-height: 88vh !important; }
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-container { 
+            background: white; 
+            width: 100%; 
+            max-width: 950px; 
+            max-height: 92vh; 
+            border-radius: 20px 20px 0 0;
+            overflow-y: auto; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
+        .modal-header h2 { font-size: 18px; font-weight: 800; color: var(--primary); }
+        .modal-close { background: none; border: none; font-size: 26px; color: var(--text-muted); cursor: pointer; }
+
+        .modal-body { padding: 18px; }
+
+        .field-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        @media (min-width: 600px) { .field-stats-grid { grid-template-columns: repeat(4, 1fr); } }
+        .f-stat { background: #f8fafc; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); }
+        .f-stat span { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .f-stat h3 { font-size: 15px; font-weight: 800; margin-top: 2px; }
+
+        .detail-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--border); margin-bottom: 16px; overflow-x: auto; }
+        .d-tab-btn { padding: 8px 12px; background: none; border: none; font-weight: 700; font-size: 13px; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+        .d-tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
+
+        .d-tab-pane { display: none; }
+        .d-tab-pane.active { display: block; }
+
+        .form-box { background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; }
+        .form-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--primary); }
+        .form-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 600px) { .form-row { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items: end; } }
+        .form-group { display: flex; flex-direction: column; gap: 3px; }
+        .form-group label { font-size: 11px; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: white; }
+
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+        th { background: #f1f5f9; color: #334155; font-weight: 700; }
+    </style>
+
+    <!-- Firebase SDK Entegrasyonu -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // BURAYA KENDİ FIREBASE PROJE BİLGİLERİNİZİ YAPIŞTIRIN
+        const firebaseConfig = {
+            apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
+            authDomain: "ciftlik-takip-34d8a.firebaseapp.com",
+            projectId: "ciftlik-takip-34d8a",
+            storageBucket: "ciftlik-takip-34d8a.firebasestorage.app",
+            messagingSenderId: "1019562274117",
+            appId: "1:1019562274117:web:85464497476022e170a22c",
+            measurementId: "G-ZXX21167XY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const docRef = doc(db, "ciftlik", "veriler");
+
+        // Canlı Dinleme (Tüm Cihazlarda Anında Güncellenir)
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                window.farmData = docSnap.data().list || [];
+            } else {
+                window.farmData = [];
+            }
+            window.renderFarmGrid();
+            window.renderGlobalSummary();
+            if (window.currentSelectedFieldId) {
+                const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+                if (field) window.renderFieldDetails(field);
+            }
+        });
+
+        // Buluta Kaydetme Fonksiyonu
+        window.saveToCloud = async function() {
+            try {
+                await setDoc(docRef, { list: window.farmData });
+            } catch (e) {
+                console.error("Bulut kaydetme hatası: ", e);
+            }
+        };
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-title">
+            <h1>🌱 Çiftlik Bulut Yönetimi</h1>
+            <p><span class="status-dot"></span> Google Firebase Canlı Senkronizasyon</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewFieldModal()">+ Tarla Ekle</button>
+    </header>
+
+    <div class="summary-bar">
+        <div class="summary-card">
+            <span>Toplam Arazi</span>
+            <h2 id="farmTotalArea">0 Da</h2>
+        </div>
+        <div class="summary-card">
+            <span>Toplam Gelir</span>
+            <h2 class="text-green" id="farmTotalIncome">0 ₺</h2>
+        </div>
+        <div class="summary-card">
+            <span>Toplam Gider</span>
+            <h2 class="text-red" id="farmTotalExpense">0 ₺</h2>
+        </div>
+        <div class="summary-card">
+            <span>Net Kâr</span>
+            <h2 class="text-primary" id="farmNetProfit">0 ₺</h2>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h2>📍 Tarlalarım</h2>
+    </div>
+
+    <div class="field-grid" id="fieldGrid"></div>
+</div>
+
+<!-- MODAL 1: YENİ TARLA EKLE -->
+<div class="modal-overlay" id="newFieldModal">
+    <div class="modal-container" style="max-width: 440px;">
+        <div class="modal-header">
+            <h2>Yeni Tarla Kaydı</h2>
+            <button class="modal-close" onclick="closeNewFieldModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="saveNewField(event)">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Tarla Adı / Mevkii *</label>
+                    <input type="text" id="newFieldName" placeholder="Örn: Dereboyu Tarlası" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Alan (Dönüm / Dekar) *</label>
+                    <input type="number" id="newFieldArea" placeholder="Örn: 35" step="0.1" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Ekim / Kullanım Durumu *</label>
+                    <select id="newFieldCrop">
+                        <option value="Pancar">Pancar</option>
+                        <option value="Nohut">Nohut</option>
+                        <option value="Ekin (Buğday)">Ekin (Buğday)</option>
+                        <option value="Arpa">Arpa</option>
+                        <option value="Kiraya Verildi">Kiraya Verildi</option>
+                        <option value="Nadas / Boş">Nadas / Boş</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Tarlayı Buluta Kaydet</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: TARLA DETAY DEFTERİ -->
+<div class="modal-overlay" id="fieldDetailModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div>
+                <h2 id="modalFieldTitle">Tarla Detayı</h2>
+                <p style="font-size: 12px; color: var(--text-muted);" id="modalFieldSub">35 Dönüm • Pancar</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteCurrentField()">Sil</button>
+                <button class="modal-close" onclick="closeFieldDetailModal()">&times;</button>
+            </div>
+        </div>
+        
+        <div class="modal-body">
+            <div class="field-stats-grid">
+                <div class="f-stat">
+                    <span>Durum</span>
+                    <h3 id="fStatCrop">Pancar</h3>
+                </div>
+                <div class="f-stat">
+                    <span>Hasat</span>
+                    <h3 id="fStatHarvest">0 Ton</h3>
+                </div>
+                <div class="f-stat">
+                    <span>Tarla Geliri</span>
+                    <h3 class="text-green" id="fStatIncome">0 ₺</h3>
+                </div>
+                <div class="f-stat">
+                    <span>Tarla Masrafı</span>
+                    <h3 class="text-red" id="fStatExpense">0 ₺</h3>
+                </div>
+            </div>
+
+            <div class="detail-tabs">
+                <button class="d-tab-btn active" id="btn-tab-ops" onclick="switchDetailTab('ops')">🌾 Tohum, Gübre & İlaç</button>
+                <button class="d-tab-btn" id="btn-tab-fin" onclick="switchDetailTab('fin')">💰 Satış, Gelir & Giderler</button>
+            </div>
+
+            <!-- SEKME 1: SAHA İŞLEMLERİ -->
+            <div class="d-tab-pane active" id="pane-ops">
+                <div class="form-box">
+                    <h4>+ Yeni Uygulama Kaydı Ekle</h4>
+                    <form onsubmit="addFieldOperation(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tarih</label>
+                                <input type="date" id="opDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tohum Cinsi</label>
+                                <input type="text" id="opSeedType" placeholder="Örn: Ceyhan">
+                            </div>
+                            <div class="form-group">
+                                <label>Tohum (Dönüme Kg)</label>
+                                <input type="number" id="opSeedPerDa" placeholder="Örn: 22" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Katı Gübre Cinsi</label>
+                                <input type="text" id="opFertType" placeholder="Örn: 20.20.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Katı Gübre (Dönüme Kg)</label>
+                                <input type="number" id="opFertPerDa" placeholder="Örn: 25" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Sıvı/Yaprak Gübresi</label>
+                                <input type="text" id="opLiquidFert" placeholder="Örn: Çinko">
+                            </div>
+                            <div class="form-group">
+                                <label>İlaçlama Notu</label>
+                                <input type="text" id="opPesticide" placeholder="Örn: Ot ilacı">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="height: 38px;">Kaydı Ekle</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Tohum (Dönüm | Toplam)</th>
+                                <th>Katı Gübre (Dönüm | Toplam)</th>
+                                <th>Sıvı Gübre</th>
+                                <th>İlaçlama</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fieldOpsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SEKME 2: FİNANS İŞLEMLERİ -->
+            <div class="d-tab-pane" id="pane-fin">
+                <div class="form-box">
+                    <h4>+ Yeni Gelir / Gider / Hasat Satışı</h4>
+                    <form onsubmit="addFieldFinance(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tarih</label>
+                                <input type="date" id="finDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>İşlem Türü</label>
+                                <select id="finType" required onchange="handleFinanceTypeChange()">
+                                    <option value="Gelir">Gelir (+)</option>
+                                    <option value="Gider">Gider (-)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kategori</label>
+                                <select id="finCategory" required onchange="handleCategoryChange()"></select>
+                            </div>
+
+                            <div class="form-group" id="groupCropKg" style="display: none;">
+                                <label>Satılan Miktar (Kg)</label>
+                                <input type="number" id="finCropKg" placeholder="Örn: 24000" step="1" oninput="calculateCropTotal()">
+                            </div>
+                            <div class="form-group" id="groupCropPrice" style="display: none;">
+                                <label>Kg Satış Fiyatı (₺)</label>
+                                <input type="number" id="finCropPrice" placeholder="Örn: 9.50" step="0.01" oninput="calculateCropTotal()">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Açıklama</label>
+                                <input type="text" id="finDesc" placeholder="Örn: Pancar teslimatı" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Toplam Tutar (₺)</label>
+                                <input type="number" id="finAmount" placeholder="0.00" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="height: 38px;">Ekle</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Tür</th>
+                                <th>Kategori</th>
+                                <th>Miktar / Kg Fiyatı</th>
+                                <th>Açıklama</th>
+                                <th>Tutar</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fieldFinBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.farmData = [];
+    window.currentSelectedFieldId = null;
+
+    const incomeCategories = ["Mahsul Satışı", "Tarla Kira Geliri", "Devlet Desteği", "Diğer Gelir"];
+    const expenseCategories = ["Tohum Masrafı", "Gübre Masrafı (Katı/Sıvı)", "İlaçlama Masrafı", "Mazot & Akaryakıt", "Biçerdöver & Hasat", "Tarla Kira Masrafı", "Diğer Masraf"];
+
+    function getBadgeClass(crop) {
+        if(crop.includes("Pancar")) return "badge-pancar";
+        if(crop.includes("Nohut")) return "badge-nohut";
+        if(crop.includes("Ekin") || crop.includes("Buğday")) return "badge-ekin";
+        if(crop.includes("Arpa")) return "badge-arpa";
+        if(crop.includes("Kira")) return "badge-kira";
+        return "badge-nadas";
+    }
+
+    window.renderFarmGrid = function() {
+        const grid = document.getElementById('fieldGrid');
+        grid.innerHTML = window.farmData.map(f => `
+            <div class="field-card" onclick="openFieldDetail(${f.id})">
+                <div class="card-top">
+                    <span class="badge ${getBadgeClass(f.crop)}">${f.crop}</span>
+                    <span class="field-size">${f.area} Da</span>
+                </div>
+                <div>
+                    <div class="field-name-center">${f.name}</div>
+                    <div style="font-size: 11.5px; color: #64748b;">${(f.operations || []).length} Uygulama • ${(f.finances || []).length} Muhasebe</div>
+                </div>
+                <div class="card-bottom">Defteri Aç ➜</div>
+            </div>
+        `).join('') + `
+            <div class="add-field-card" onclick="openNewFieldModal()">
+                <div class="icon">+</div>
+                <span>Yeni Tarla Ekle</span>
+            </div>
+        `;
+    };
+
+    window.renderGlobalSummary = function() {
+        let totalArea = window.farmData.reduce((sum, f) => sum + (parseFloat(f.area) || 0), 0);
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        window.farmData.forEach(f => {
+            (f.finances || []).forEach(fin => {
+                if(fin.type === "Gelir") totalIncome += fin.amount;
+                if(fin.type === "Gider") totalExpense += fin.amount;
+            });
+        });
+
+        document.getElementById('farmTotalArea').innerText = totalArea + " Da";
+        document.getElementById('farmTotalIncome').innerText = totalIncome.toLocaleString('tr-TR', { maximumFractionDigits: 0 }) + " ₺";
+        document.getElementById('farmTotalExpense').innerText = totalExpense.toLocaleString('tr-TR', { maximumFractionDigits: 0 }) + " ₺";
+        document.getElementById('farmNetProfit').innerText = (totalIncome - totalExpense).toLocaleString('tr-TR', { maximumFractionDigits: 0 }) + " ₺";
+    };
+
+    function handleFinanceTypeChange() {
+        const type = document.getElementById('finType').value;
+        const catSelect = document.getElementById('finCategory');
+        catSelect.innerHTML = "";
+
+        const list = type === "Gelir" ? incomeCategories : expenseCategories;
+        list.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c;
+            opt.innerText = c;
+            catSelect.appendChild(opt);
+        });
+
+        handleCategoryChange();
+    }
+
+    function handleCategoryChange() {
+        const type = document.getElementById('finType').value;
+        const category = document.getElementById('finCategory').value;
+        const isCropSale = (type === "Gelir" && category === "Mahsul Satışı");
+
+        document.getElementById('groupCropKg').style.display = isCropSale ? "flex" : "none";
+        document.getElementById('groupCropPrice').style.display = isCropSale ? "flex" : "none";
+    }
+
+    function calculateCropTotal() {
+        const kg = parseFloat(document.getElementById('finCropKg').value) || 0;
+        const price = parseFloat(document.getElementById('finCropPrice').value) || 0;
+        if (kg > 0 && price > 0) {
+            document.getElementById('finAmount').value = (kg * price).toFixed(2);
+        }
+    }
+
+    function openNewFieldModal() {
+        document.getElementById('newFieldModal').classList.add('active');
+    }
+    function closeNewFieldModal() {
+        document.getElementById('newFieldModal').classList.remove('active');
+    }
+
+    function saveNewField(e) {
+        e.preventDefault();
+        const newField = {
+            id: Date.now(),
+            name: document.getElementById('newFieldName').value,
+            area: parseFloat(document.getElementById('newFieldArea').value) || 0,
+            crop: document.getElementById('newFieldCrop').value,
+            operations: [],
+            finances: []
+        };
+        window.farmData.push(newField);
+        window.saveToCloud();
+        closeNewFieldModal();
+        document.getElementById('newFieldName').value = "";
+        document.getElementById('newFieldArea').value = "";
+    }
+
+    function openFieldDetail(fieldId) {
+        window.currentSelectedFieldId = fieldId;
+        const field = window.farmData.find(f => f.id === fieldId);
+        if(!field) return;
+
+        document.getElementById('modalFieldTitle').innerText = field.name;
+        document.getElementById('modalFieldSub').innerText = `${field.area} Dönüm • ${field.crop}`;
+        document.getElementById('fStatCrop').innerText = field.crop;
+
+        document.getElementById('opDate').valueAsDate = new Date();
+        document.getElementById('finDate').valueAsDate = new Date();
+
+        handleFinanceTypeChange();
+        window.renderFieldDetails(field);
+        document.getElementById('fieldDetailModal').classList.add('active');
+    }
+
+    function closeFieldDetailModal() {
+        document.getElementById('fieldDetailModal').classList.remove('active');
+        window.currentSelectedFieldId = null;
+    }
+
+    window.renderFieldDetails = function(field) {
+        let income = (field.finances || []).filter(f => f.type === "Gelir").reduce((s, i) => s + i.amount, 0);
+        let expense = (field.finances || []).filter(f => f.type === "Gider").reduce((s, i) => s + i.amount, 0);
+
+        let totalCropKg = (field.finances || [])
+            .filter(f => f.type === "Gelir" && f.cropKg > 0)
+            .reduce((s, i) => s + i.cropKg, 0);
+
+        document.getElementById('fStatHarvest').innerText = totalCropKg > 0 ? `${(totalCropKg / 1000).toFixed(1)} Ton` : '0 Ton';
+        document.getElementById('fStatIncome').innerText = income.toLocaleString('tr-TR', { maximumFractionDigits: 0 }) + " ₺";
+        document.getElementById('fStatExpense').innerText = expense.toLocaleString('tr-TR', { maximumFractionDigits: 0 }) + " ₺";
+
+        const opsBody = document.getElementById('fieldOpsBody');
+        opsBody.innerHTML = (!field.operations || field.operations.length === 0) 
+            ? '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Henüz saha kaydı yok.</td></tr>'
+            : field.operations.map(o => `
+            <tr>
+                <td>${o.date}</td>
+                <td>${o.seedType ? `<strong>${o.seedType}</strong> (${o.seedPerDa} kg/da | ${(o.seedPerDa * field.area).toFixed(0)} kg)` : '-'}</td>
+                <td>${o.fertType ? `<strong>${o.fertType}</strong> (${o.fertPerDa} kg/da | ${(o.fertPerDa * field.area).toFixed(0)} kg)` : '-'}</td>
+                <td>${o.liquidFert || '-'}</td>
+                <td>${o.pesticide || '-'}</td>
+                <td><button class="btn btn-danger" style="padding: 3px 6px; font-size: 11px;" onclick="deleteFieldOp(${o.id})">Sil</button></td>
+            </tr>
+        `).join('');
+
+        const finBody = document.getElementById('fieldFinBody');
+        finBody.innerHTML = (!field.finances || field.finances.length === 0)
+            ? '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Henüz muhasebe kaydı yok.</td></tr>'
+            : field.finances.map(f => `
+                <tr>
+                    <td>${f.date}</td>
+                    <td><span style="font-weight:700; color:${f.type === 'Gelir' ? 'var(--success)' : 'var(--danger)'};">${f.type}</span></td>
+                    <td>${f.category}</td>
+                    <td>${f.cropKg > 0 ? `${(f.cropKg / 1000).toFixed(1)} Ton (${f.cropPrice} ₺/kg)` : '-'}</td>
+                    <td>${f.desc}</td>
+                    <td><strong>${f.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</strong></td>
+                    <td><button class="btn btn-danger" style="padding: 3px 6px; font-size: 11px;" onclick="deleteFieldFin(${f.id})">Sil</button></td>
+                </tr>
+            `).join('');
+    };
+
+    function switchDetailTab(tabKey) {
+        document.querySelectorAll('.d-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.d-tab-pane').forEach(p => p.classList.remove('active'));
+
+        document.getElementById('btn-tab-' + tabKey).classList.add('active');
+        document.getElementById('pane-' + tabKey).classList.add('active');
+    }
+
+    function addFieldOperation(e) {
+        e.preventDefault();
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+
+        if(!field.operations) field.operations = [];
+
+        const newOp = {
+            id: Date.now(),
+            date: document.getElementById('opDate').value,
+            seedType: document.getElementById('opSeedType').value,
+            seedPerDa: parseFloat(document.getElementById('opSeedPerDa').value) || 0,
+            fertType: document.getElementById('opFertType').value,
+            fertPerDa: parseFloat(document.getElementById('opFertPerDa').value) || 0,
+            liquidFert: document.getElementById('opLiquidFert').value,
+            pesticide: document.getElementById('opPesticide').value
+        };
+
+        field.operations.unshift(newOp);
+        window.saveToCloud();
+        e.target.reset();
+        document.getElementById('opDate').valueAsDate = new Date();
+    }
+
+    function addFieldFinance(e) {
+        e.preventDefault();
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+
+        if(!field.finances) field.finances = [];
+
+        const cropKg = parseFloat(document.getElementById('finCropKg').value) || 0;
+        const cropPrice = parseFloat(document.getElementById('finCropPrice').value) || 0;
+
+        const newFin = {
+            id: Date.now(),
+            date: document.getElementById('finDate').value,
+            type: document.getElementById('finType').value,
+            category: document.getElementById('finCategory').value,
+            cropKg: cropKg,
+            cropPrice: cropPrice,
+            desc: document.getElementById('finDesc').value,
+            amount: parseFloat(document.getElementById('finAmount').value) || 0
+        };
+
+        field.finances.unshift(newFin);
+        window.saveToCloud();
+        e.target.reset();
+        document.getElementById('finDate').valueAsDate = new Date();
+        handleFinanceTypeChange();
+    }
+
+    function deleteFieldOp(opId) {
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(field && confirm("Bu işlemi silmek istiyor musunuz?")) {
+            field.operations = field.operations.filter(o => o.id !== opId);
+            window.saveToCloud();
+        }
+    }
+
+    function deleteFieldFin(finId) {
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(field && confirm("Bu kaydı silmek istiyor musunuz?")) {
+            field.finances = field.finances.filter(f => f.id !== finId);
+            window.saveToCloud();
+        }
+    }
+
+    function deleteCurrentField() {
+        if(confirm("Tarlayı ve tüm kayıtlarını silmek istiyor musunuz?")) {
+            window.farmData = window.farmData.filter(f => f.id !== window.currentSelectedFieldId);
+            window.saveToCloud();
+            closeFieldDetailModal();
+        }
+    }
+</script>
+</body>
+</html>
