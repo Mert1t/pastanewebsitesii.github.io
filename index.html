@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Çiftlik Bulut Yönetim Paneli</title>
+    <title>Çiftlik Bulut & Parsel Takip</title>
     <style>
         :root {
             --primary: #1b4332;
@@ -18,6 +18,7 @@
             --success: #16a34a;
             --danger: #dc2626;
             --warning: #d97706;
+            --tkgm-color: #0284c7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -42,7 +43,7 @@
         .section-header h2 { font-size: 16px; font-weight: 700; color: var(--primary); }
 
         .field-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        @media (min-width: 600px) { .field-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; } }
+        @media (min-width: 600px) { .field-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; } }
 
         .field-card { 
             background: white; 
@@ -57,7 +58,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
             cursor: pointer; 
             transition: transform 0.2s;
-            min-height: 190px;
+            min-height: 200px;
         }
         .field-card:active { transform: scale(0.98); }
 
@@ -70,15 +71,16 @@
         .badge-kira { background: #dbeafe; color: #1e40af; }
         .badge-nadas { background: #f3f4f6; color: #4b5563; }
 
-        .field-card .field-name-center { font-size: 19px; font-weight: 800; color: var(--primary); margin: 12px 0 6px 0; }
+        .field-card .field-name-center { font-size: 19px; font-weight: 800; color: var(--primary); margin: 10px 0 4px 0; }
+        .field-card .field-parsel-info { font-size: 12px; color: var(--tkgm-color); font-weight: 600; margin-bottom: 6px; }
         .field-card .field-size { font-size: 13px; font-weight: 600; color: var(--text-muted); }
-        .field-card .card-bottom { width: 100%; font-size: 12px; font-weight: 700; color: var(--primary-light); background: #f0fdf4; padding: 7px 10px; border-radius: 8px; margin-top: 12px; }
+        .field-card .card-bottom { width: 100%; font-size: 12px; font-weight: 700; color: var(--primary-light); background: #f0fdf4; padding: 7px 10px; border-radius: 8px; margin-top: 10px; }
 
         .add-field-card {
             background: #fafafa;
             border: 2px dashed #cbd5e1;
             border-radius: 14px;
-            min-height: 190px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -89,10 +91,10 @@
         .add-field-card .icon { font-size: 32px; margin-bottom: 6px; }
         .add-field-card span { font-weight: 700; font-size: 14px; }
 
-        .btn { padding: 8px 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn { padding: 8px 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-tkgm { background: var(--tkgm-color); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-main); }
 
         .modal-overlay { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
@@ -141,7 +143,7 @@
         .form-box { background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; }
         .form-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--primary); }
         .form-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        @media (min-width: 600px) { .form-row { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items: end; } }
+        @media (min-width: 600px) { .form-row { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); align-items: end; } }
         .form-group { display: flex; flex-direction: column; gap: 3px; }
         .form-group label { font-size: 11px; font-weight: 600; color: #475569; }
         .form-group input, .form-group select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: white; }
@@ -152,14 +154,13 @@
         th { background: #f1f5f9; color: #334155; font-weight: 700; }
     </style>
 
-    <!-- Firebase SDK Entegrasyonu -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        // BURAYA KENDİ FIREBASE PROJE BİLGİLERİNİZİ YAPIŞTIRIN
+        // FIREBASE PROJE AYARLARINIZ
         const firebaseConfig = {
-            apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
+           apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
             authDomain: "ciftlik-takip-34d8a.firebaseapp.com",
             projectId: "ciftlik-takip-34d8a",
             storageBucket: "ciftlik-takip-34d8a.firebasestorage.app",
@@ -172,7 +173,6 @@
         const db = getFirestore(app);
         const docRef = doc(db, "ciftlik", "veriler");
 
-        // Canlı Dinleme (Tüm Cihazlarda Anında Güncellenir)
         onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
                 window.farmData = docSnap.data().list || [];
@@ -187,7 +187,6 @@
             }
         });
 
-        // Buluta Kaydetme Fonksiyonu
         window.saveToCloud = async function() {
             try {
                 await setDoc(docRef, { list: window.farmData });
@@ -202,8 +201,8 @@
 <div class="container">
     <header>
         <div class="header-title">
-            <h1>🌱 Çiftlik Bulut Yönetimi</h1>
-            <p><span class="status-dot"></span> Google Firebase Canlı Senkronizasyon</p>
+            <h1>🌱 Çiftlik & Parsel Takip Paneli</h1>
+            <p><span class="status-dot"></span> Canlı Bulut Senkronizasyonu</p>
         </div>
         <button class="btn btn-primary" onclick="openNewFieldModal()">+ Tarla Ekle</button>
     </header>
@@ -234,35 +233,66 @@
     <div class="field-grid" id="fieldGrid"></div>
 </div>
 
-<!-- MODAL 1: YENİ TARLA EKLE -->
+<!-- MODAL 1: YENİ TARLA EKLE (PARSEL BİLGİLERİ DAHİL) -->
 <div class="modal-overlay" id="newFieldModal">
-    <div class="modal-container" style="max-width: 440px;">
+    <div class="modal-container" style="max-width: 480px;">
         <div class="modal-header">
-            <h2>Yeni Tarla Kaydı</h2>
+            <h2>Yeni Tarla & Parsel Kaydı</h2>
             <button class="modal-close" onclick="closeNewFieldModal()">&times;</button>
         </div>
         <div class="modal-body">
             <form onsubmit="saveNewField(event)">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label>Tarla Adı / Mevkii *</label>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Tarla Adı / Takma Adı *</label>
                     <input type="text" id="newFieldName" placeholder="Örn: Dereboyu Tarlası" required>
                 </div>
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label>Alan (Dönüm / Dekar) *</label>
-                    <input type="number" id="newFieldArea" placeholder="Örn: 35" step="0.1" required>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Alan (Dönüm / Dekar) *</label>
+                        <input type="number" id="newFieldArea" placeholder="Örn: 45" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mevcut Durum *</label>
+                        <select id="newFieldCrop">
+                            <option value="Pancar">Pancar</option>
+                            <option value="Nohut">Nohut</option>
+                            <option value="Ekin (Buğday)">Ekin (Buğday)</option>
+                            <option value="Arpa">Arpa</option>
+                            <option value="Kiraya Verildi">Kiraya Verildi</option>
+                            <option value="Nadas / Boş">Nadas / Boş</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label>Ekim / Kullanım Durumu *</label>
-                    <select id="newFieldCrop">
-                        <option value="Pancar">Pancar</option>
-                        <option value="Nohut">Nohut</option>
-                        <option value="Ekin (Buğday)">Ekin (Buğday)</option>
-                        <option value="Arpa">Arpa</option>
-                        <option value="Kiraya Verildi">Kiraya Verildi</option>
-                        <option value="Nadas / Boş">Nadas / Boş</option>
-                    </select>
+
+                <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 14px;">
+                    <div style="font-size: 11.5px; font-weight: 700; color: var(--tkgm-color); margin-bottom: 8px;">🗺️ TKGM Parsel Sorgu Bilgileri</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <div class="form-group">
+                            <label>İl</label>
+                            <input type="text" id="newFieldIl" placeholder="Örn: Ankara">
+                        </div>
+                        <div class="form-group">
+                            <label>İlçe</label>
+                            <input type="text" id="newFieldIlce" placeholder="Örn: Polatlı">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <label>Mahalle / Köy</label>
+                        <input type="text" id="newFieldMahalle" placeholder="Örn: Yeniköseler">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div class="form-group">
+                            <label>Ada No</label>
+                            <input type="text" id="newFieldAda" placeholder="Örn: 105">
+                        </div>
+                        <div class="form-group">
+                            <label>Parsel No</label>
+                            <input type="text" id="newFieldParsel" placeholder="Örn: 12">
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Tarlayı Buluta Kaydet</button>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Tarlayı Kaydet</button>
             </form>
         </div>
     </div>
@@ -274,10 +304,11 @@
         <div class="modal-header">
             <div>
                 <h2 id="modalFieldTitle">Tarla Detayı</h2>
-                <p style="font-size: 12px; color: var(--text-muted);" id="modalFieldSub">35 Dönüm • Pancar</p>
+                <p style="font-size: 12px; color: var(--text-muted);" id="modalFieldSub">45 Dönüm • Pancar</p>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteCurrentField()">Sil</button>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <a id="btnParselSorgu" class="btn btn-tkgm" target="_blank" style="font-size: 11.5px; padding: 6px 10px;">🗺️ Parsel Sorgu'da Aç</a>
+                <button class="btn btn-danger" style="padding: 6px 10px; font-size: 11.5px;" onclick="deleteCurrentField()">Sil</button>
                 <button class="modal-close" onclick="closeFieldDetailModal()">&times;</button>
             </div>
         </div>
@@ -446,7 +477,9 @@
 
     window.renderFarmGrid = function() {
         const grid = document.getElementById('fieldGrid');
-        grid.innerHTML = window.farmData.map(f => `
+        grid.innerHTML = window.farmData.map(f => {
+            const parselLabel = (f.ada && f.parsel) ? `Ada: ${f.ada} / Parsel: ${f.parsel}` : (f.mahalle || 'Konum Girilmedi');
+            return `
             <div class="field-card" onclick="openFieldDetail(${f.id})">
                 <div class="card-top">
                     <span class="badge ${getBadgeClass(f.crop)}">${f.crop}</span>
@@ -454,11 +487,12 @@
                 </div>
                 <div>
                     <div class="field-name-center">${f.name}</div>
+                    <div class="field-parsel-info">${parselLabel}</div>
                     <div style="font-size: 11.5px; color: #64748b;">${(f.operations || []).length} Uygulama • ${(f.finances || []).length} Muhasebe</div>
                 </div>
-                <div class="card-bottom">Defteri Aç ➜</div>
-            </div>
-        `).join('') + `
+                <div class="card-bottom">Defteri & Haritayı Aç ➜</div>
+            </div>`;
+        }).join('') + `
             <div class="add-field-card" onclick="openNewFieldModal()">
                 <div class="icon">+</div>
                 <span>Yeni Tarla Ekle</span>
@@ -531,14 +565,18 @@
             name: document.getElementById('newFieldName').value,
             area: parseFloat(document.getElementById('newFieldArea').value) || 0,
             crop: document.getElementById('newFieldCrop').value,
+            il: document.getElementById('newFieldIl').value.trim(),
+            ilce: document.getElementById('newFieldIlce').value.trim(),
+            mahalle: document.getElementById('newFieldMahalle').value.trim(),
+            ada: document.getElementById('newFieldAda').value.trim(),
+            parsel: document.getElementById('newFieldParsel').value.trim(),
             operations: [],
             finances: []
         };
         window.farmData.push(newField);
         window.saveToCloud();
         closeNewFieldModal();
-        document.getElementById('newFieldName').value = "";
-        document.getElementById('newFieldArea').value = "";
+        e.target.reset();
     }
 
     function openFieldDetail(fieldId) {
@@ -549,6 +587,14 @@
         document.getElementById('modalFieldTitle').innerText = field.name;
         document.getElementById('modalFieldSub').innerText = `${field.area} Dönüm • ${field.crop}`;
         document.getElementById('fStatCrop').innerText = field.crop;
+
+        // Parsel Sorgu Buton Linkini Oluştur
+        const btnParsel = document.getElementById('btnParselSorgu');
+        if (field.il && field.ilce && field.mahalle && field.ada && field.parsel) {
+            btnParsel.href = `https://parselsorgu.tkgm.gov.tr/#ara/idari/${encodeURIComponent(field.il)}/${encodeURIComponent(field.ilce)}/${encodeURIComponent(field.mahalle)}/${encodeURIComponent(field.ada)}/${encodeURIComponent(field.parsel)}`;
+        } else {
+            btnParsel.href = "https://parselsorgu.tkgm.gov.tr/";
+        }
 
         document.getElementById('opDate').valueAsDate = new Date();
         document.getElementById('finDate').valueAsDate = new Date();
