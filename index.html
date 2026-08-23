@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Çiftlik Bulut & Parsel Takip</title>
+    <title>Çiftlik & Parsel Takip Paneli</title>
     <style>
         :root {
             --primary: #1b4332;
@@ -158,15 +158,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        // FIREBASE PROJE AYARLARINIZ
+        // BURAYA KENDİ FIREBASE AYARLARINIZI YAPIŞTIRIN
         const firebaseConfig = {
-           apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
-            authDomain: "ciftlik-takip-34d8a.firebaseapp.com",
-            projectId: "ciftlik-takip-34d8a",
-            storageBucket: "ciftlik-takip-34d8a.firebasestorage.app",
-            messagingSenderId: "1019562274117",
-            appId: "1:1019562274117:web:85464497476022e170a22c",
-            measurementId: "G-ZXX21167XY"
+            apiKey: "API_KEY_BURAYA",
+            authDomain: "PROJENIZ.firebaseapp.com",
+            projectId: "PROJE_ID_BURAYA",
+            storageBucket: "PROJENIZ.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -233,11 +232,11 @@
     <div class="field-grid" id="fieldGrid"></div>
 </div>
 
-<!-- MODAL 1: YENİ TARLA EKLE (PARSEL BİLGİLERİ DAHİL) -->
+<!-- MODAL 1: YENİ TARLA EKLE -->
 <div class="modal-overlay" id="newFieldModal">
     <div class="modal-container" style="max-width: 480px;">
         <div class="modal-header">
-            <h2>Yeni Tarla & Parsel Kaydı</h2>
+            <h2>Yeni Tarla Kaydı</h2>
             <button class="modal-close" onclick="closeNewFieldModal()">&times;</button>
         </div>
         <div class="modal-body">
@@ -264,21 +263,12 @@
                     </div>
                 </div>
 
+                <!-- Parsel Linki / Konum Alanı -->
                 <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 14px;">
-                    <div style="font-size: 11.5px; font-weight: 700; color: var(--tkgm-color); margin-bottom: 8px;">🗺️ TKGM Parsel Sorgu Bilgileri</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                        <div class="form-group">
-                            <label>İl</label>
-                            <input type="text" id="newFieldIl" placeholder="Örn: Ankara">
-                        </div>
-                        <div class="form-group">
-                            <label>İlçe</label>
-                            <input type="text" id="newFieldIlce" placeholder="Örn: Polatlı">
-                        </div>
-                    </div>
+                    <div style="font-size: 11.5px; font-weight: 700; color: var(--tkgm-color); margin-bottom: 6px;">🗺️ Parsel Sorgu veya Harita Bağlantısı</div>
                     <div class="form-group" style="margin-bottom: 8px;">
-                        <label>Mahalle / Köy</label>
-                        <input type="text" id="newFieldMahalle" placeholder="Örn: Yeniköseler">
+                        <label>Parsel Sorgu veya Konum Linki (İsteğe Bağlı)</label>
+                        <input type="url" id="newFieldMapUrl" placeholder="https://parselsorgu.tkgm.gov.tr/#...">
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="form-group">
@@ -307,7 +297,7 @@
                 <p style="font-size: 12px; color: var(--text-muted);" id="modalFieldSub">45 Dönüm • Pancar</p>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
-                <a id="btnParselSorgu" class="btn btn-tkgm" target="_blank" style="font-size: 11.5px; padding: 6px 10px;">🗺️ Parsel Sorgu'da Aç</a>
+                <a id="btnParselSorgu" class="btn btn-tkgm" target="_blank" style="font-size: 11.5px; padding: 6px 10px;">🗺️ Haritada / Parselde Aç</a>
                 <button class="btn btn-danger" style="padding: 6px 10px; font-size: 11.5px;" onclick="deleteCurrentField()">Sil</button>
                 <button class="modal-close" onclick="closeFieldDetailModal()">&times;</button>
             </div>
@@ -478,7 +468,7 @@
     window.renderFarmGrid = function() {
         const grid = document.getElementById('fieldGrid');
         grid.innerHTML = window.farmData.map(f => {
-            const parselLabel = (f.ada && f.parsel) ? `Ada: ${f.ada} / Parsel: ${f.parsel}` : (f.mahalle || 'Konum Girilmedi');
+            const parselLabel = (f.ada && f.parsel) ? `Ada: ${f.ada} / Parsel: ${f.parsel}` : (f.mapUrl ? 'Harita Linki Kayıtlı' : 'Konum Girilmedi');
             return `
             <div class="field-card" onclick="openFieldDetail(${f.id})">
                 <div class="card-top">
@@ -565,9 +555,7 @@
             name: document.getElementById('newFieldName').value,
             area: parseFloat(document.getElementById('newFieldArea').value) || 0,
             crop: document.getElementById('newFieldCrop').value,
-            il: document.getElementById('newFieldIl').value.trim(),
-            ilce: document.getElementById('newFieldIlce').value.trim(),
-            mahalle: document.getElementById('newFieldMahalle').value.trim(),
+            mapUrl: document.getElementById('newFieldMapUrl').value.trim(),
             ada: document.getElementById('newFieldAda').value.trim(),
             parsel: document.getElementById('newFieldParsel').value.trim(),
             operations: [],
@@ -588,10 +576,9 @@
         document.getElementById('modalFieldSub').innerText = `${field.area} Dönüm • ${field.crop}`;
         document.getElementById('fStatCrop').innerText = field.crop;
 
-        // Parsel Sorgu Buton Linkini Oluştur
         const btnParsel = document.getElementById('btnParselSorgu');
-        if (field.il && field.ilce && field.mahalle && field.ada && field.parsel) {
-            btnParsel.href = `https://parselsorgu.tkgm.gov.tr/#ara/idari/${encodeURIComponent(field.il)}/${encodeURIComponent(field.ilce)}/${encodeURIComponent(field.mahalle)}/${encodeURIComponent(field.ada)}/${encodeURIComponent(field.parsel)}`;
+        if (field.mapUrl) {
+            btnParsel.href = field.mapUrl;
         } else {
             btnParsel.href = "https://parselsorgu.tkgm.gov.tr/";
         }
