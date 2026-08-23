@@ -96,6 +96,7 @@
         .btn-tkgm { background: var(--tkgm-color); color: white; }
         .btn-danger { background: var(--danger); color: white; }
 
+        /* Katman Düzeltmesi */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
             background: rgba(0, 0, 0, 0.6); 
@@ -103,6 +104,10 @@
             justify-content: center; 
             align-items: flex-end; 
             z-index: 1000;
+        }
+        .modal-overlay.top-modal {
+            z-index: 2000 !important;
+            background: rgba(0, 0, 0, 0.7);
         }
         @media (min-width: 768px) {
             .modal-overlay { align-items: center; padding: 20px; }
@@ -119,6 +124,7 @@
             overflow-y: auto; 
             display: flex;
             flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
         .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
@@ -161,7 +167,7 @@
 
         // BURAYA KENDİ FIREBASE AYARLARINIZI YAPIŞTIRIN
         const firebaseConfig = {
-           apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
+            apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
   authDomain: "ciftlik-takip-34d8a.firebaseapp.com",
   projectId: "ciftlik-takip-34d8a",
   storageBucket: "ciftlik-takip-34d8a.firebasestorage.app",
@@ -276,8 +282,8 @@
     </div>
 </div>
 
-<!-- MODAL 2: TARLA DÜZENLEME MODALI -->
-<div class="modal-overlay" id="editFieldModal">
+<!-- MODAL 2: TARLA DÜZENLEME MODALI (TOP MODAL) -->
+<div class="modal-overlay top-modal" id="editFieldModal">
     <div class="modal-container" style="max-width: 480px;">
         <div class="modal-header">
             <h2>Tarla Bilgilerini Düzenle</h2>
@@ -318,8 +324,8 @@
     </div>
 </div>
 
-<!-- MODAL 3: SAHA İŞLEMİ DÜZENLEME MODALI -->
-<div class="modal-overlay" id="editOpModal">
+<!-- MODAL 3: SAHA İŞLEMİ DÜZENLEME MODALI (TOP MODAL) -->
+<div class="modal-overlay top-modal" id="editOpModal">
     <div class="modal-container" style="max-width: 500px;">
         <div class="modal-header">
             <h2>Uygulama Kaydını Düzenle</h2>
@@ -366,8 +372,8 @@
     </div>
 </div>
 
-<!-- MODAL 4: FİNANS / GELİR-GİDER DÜZENLEME MODALI -->
-<div class="modal-overlay" id="editFinModal">
+<!-- MODAL 4: FİNANS DÜZENLEME MODALI (TOP MODAL) -->
+<div class="modal-overlay top-modal" id="editFinModal">
     <div class="modal-container" style="max-width: 500px;">
         <div class="modal-header">
             <h2>Gelir / Gider Kaydını Düzenle</h2>
