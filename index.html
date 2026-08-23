@@ -263,7 +263,8 @@
                         <select id="newFieldCrop">
                             <option value="Pancar">Pancar</option>
                             <option value="Nohut">Nohut</option>
-                            <option value="Ekin (Buğday)">Ekin (Buğday)</option>
+                            <option value="Buğday (Makarnalık)">Buğday (Makarnalık)</option>
+                            <option value="Buğday (Ekmeklik)">Buğday (Ekmeklik)</option>
                             <option value="Arpa">Arpa</option>
                             <option value="Kiraya Verildi">Kiraya Verildi</option>
                             <option value="Nadas / Boş">Nadas / Boş</option>
@@ -303,13 +304,14 @@
                     <div class="form-group">
                         <label>Ekim Durumu *</label>
                         <select id="editFieldCrop">
-                            <option value="Pancar">Pancar</option>
-                            <option value="Nohut">Nohut</option>
-                            <option value="Ekin (Buğday)">Ekin (Buğday)</option>
-                            <option value="Arpa">Arpa</option>
-                            <option value="Kiraya Verildi">Kiraya Verildi</option>
-                            <option value="Nadas / Boş">Nadas / Boş</option>
-                        </select>
+    <option value="Pancar">Pancar</option>
+    <option value="Nohut">Nohut</option>
+    <option value="Buğday (Makarnalık)">Buğday (Makarnalık)</option>
+    <option value="Buğday (Ekmeklik)">Buğday (Ekmeklik)</option>
+    <option value="Arpa">Arpa</option>
+    <option value="Kiraya Verildi">Kiraya Verildi</option>
+    <option value="Nadas / Boş">Nadas / Boş</option>
+</select>
                     </div>
                 </div>
 
@@ -596,13 +598,13 @@
     const expenseCategories = ["Tohum Masrafı", "Gübre Masrafı (Katı/Sıvı)", "İlaçlama Masrafı", "Mazot & Akaryakıt", "Biçerdöver & Hasat", "Tarla Kira Masrafı", "Diğer Masraf"];
 
     function getBadgeClass(crop) {
-        if(crop.includes("Pancar")) return "badge-pancar";
-        if(crop.includes("Nohut")) return "badge-nohut";
-        if(crop.includes("Ekin") || crop.includes("Buğday")) return "badge-ekin";
-        if(crop.includes("Arpa")) return "badge-arpa";
-        if(crop.includes("Kira")) return "badge-kira";
-        return "badge-nadas";
-    }
+    if(crop.includes("Pancar")) return "badge-pancar";
+    if(crop.includes("Nohut")) return "badge-nohut";
+    if(crop.includes("Buğday") || crop.includes("Ekin")) return "badge-ekin";
+    if(crop.includes("Arpa")) return "badge-arpa";
+    if(crop.includes("Kira")) return "badge-kira";
+    return "badge-nadas";
+}
 
     window.renderFarmGrid = function() {
         const grid = document.getElementById('fieldGrid');
