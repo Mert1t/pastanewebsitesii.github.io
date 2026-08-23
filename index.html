@@ -92,6 +92,7 @@
 
         .btn { padding: 8px 14px; border: none; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         .btn-tkgm { background: var(--tkgm-color); color: white; }
         .btn-danger { background: var(--danger); color: white; }
 
@@ -151,6 +152,7 @@
         table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
         th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
         th { background: #f1f5f9; color: #334155; font-weight: 700; }
+        .action-btns { display: flex; gap: 4px; }
     </style>
 
     <script type="module">
@@ -159,13 +161,12 @@
 
         // BURAYA KENDİ FIREBASE AYARLARINIZI YAPIŞTIRIN
         const firebaseConfig = {
-            apiKey: "AIzaSyD2MgMS7BuQDxay8SVwNxJiRUNF0hQA_1g",
-  authDomain: "ciftlik-takip-34d8a.firebaseapp.com",
-  projectId: "ciftlik-takip-34d8a",
-  storageBucket: "ciftlik-takip-34d8a.firebasestorage.app",
-  messagingSenderId: "1019562274117",
-  appId: "1:1019562274117:web:85464497476022e170a22c",
-  measurementId: "G-ZXX21167XY"
+            apiKey: "API_KEY_BURAYA",
+            authDomain: "PROJENIZ.firebaseapp.com",
+            projectId: "PROJE_ID_BURAYA",
+            storageBucket: "PROJENIZ.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -274,7 +275,151 @@
     </div>
 </div>
 
-<!-- MODAL 2: TARLA DETAY DEFTERİ -->
+<!-- MODAL 2: TARLA DÜZENLEME MODALI -->
+<div class="modal-overlay" id="editFieldModal">
+    <div class="modal-container" style="max-width: 480px;">
+        <div class="modal-header">
+            <h2>Tarla Bilgilerini Düzenle</h2>
+            <button class="modal-close" onclick="closeEditFieldModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="saveEditedField(event)">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Tarla Adı *</label>
+                    <input type="text" id="editFieldName" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Alan (Dönüm / Dekar) *</label>
+                        <input type="number" id="editFieldArea" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ekim Durumu *</label>
+                        <select id="editFieldCrop">
+                            <option value="Pancar">Pancar</option>
+                            <option value="Nohut">Nohut</option>
+                            <option value="Ekin (Buğday)">Ekin (Buğday)</option>
+                            <option value="Arpa">Arpa</option>
+                            <option value="Kiraya Verildi">Kiraya Verildi</option>
+                            <option value="Nadas / Boş">Nadas / Boş</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>🗺️ Parsel Sorgu veya Harita Linki</label>
+                    <input type="url" id="editFieldMapUrl">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Değişiklikleri Kaydet</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 3: SAHA İŞLEMİ DÜZENLEME MODALI -->
+<div class="modal-overlay" id="editOpModal">
+    <div class="modal-container" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2>Uygulama Kaydını Düzenle</h2>
+            <button class="modal-close" onclick="closeEditOpModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="saveEditedOp(event)">
+                <input type="hidden" id="editOpId">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Tarih *</label>
+                    <input type="date" id="editOpDate" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Tohum Cinsi</label>
+                        <input type="text" id="editOpSeedType">
+                    </div>
+                    <div class="form-group">
+                        <label>Tohum (Dönüme Kg)</label>
+                        <input type="number" id="editOpSeedPerDa" step="0.1">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Katı Gübre Cinsi</label>
+                        <input type="text" id="editOpFertType">
+                    </div>
+                    <div class="form-group">
+                        <label>Katı Gübre (Dönüme Kg)</label>
+                        <input type="number" id="editOpFertPerDa" step="0.1">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Sıvı/Yaprak Gübresi</label>
+                    <input type="text" id="editOpLiquidFert">
+                </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>İlaçlama Notu</label>
+                    <input type="text" id="editOpPesticide">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Kaydı Güncelle</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 4: FİNANS / GELİR-GİDER DÜZENLEME MODALI -->
+<div class="modal-overlay" id="editFinModal">
+    <div class="modal-container" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2>Gelir / Gider Kaydını Düzenle</h2>
+            <button class="modal-close" onclick="closeEditFinModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="saveEditedFin(event)">
+                <input type="hidden" id="editFinId">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Tarih *</label>
+                    <input type="date" id="editFinDate" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>İşlem Türü *</label>
+                        <select id="editFinType" required onchange="handleEditFinanceTypeChange()">
+                            <option value="Gelir">Gelir (+)</option>
+                            <option value="Gider">Gider (-)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori *</label>
+                        <select id="editFinCategory" required onchange="handleEditCategoryChange()"></select>
+                    </div>
+                </div>
+
+                <div id="groupEditCropKg" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Satılan Miktar (Kg)</label>
+                        <input type="number" id="editFinCropKg" step="1" oninput="calculateEditCropTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label>Kg Satış Fiyatı (₺)</label>
+                        <input type="number" id="editFinCropPrice" step="0.01" oninput="calculateEditCropTotal()">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>Açıklama *</label>
+                    <input type="text" id="editFinDesc" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label>Toplam Tutar (₺) *</label>
+                    <input type="number" id="editFinAmount" step="0.01" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Değişiklikleri Kaydet</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 5: TARLA DETAY DEFTERİ -->
 <div class="modal-overlay" id="fieldDetailModal">
     <div class="modal-container">
         <div class="modal-header">
@@ -282,8 +427,9 @@
                 <h2 id="modalFieldTitle">Tarla Detayı</h2>
                 <p style="font-size: 12px; color: var(--text-muted);" id="modalFieldSub">45 Dönüm • Pancar</p>
             </div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-                <a id="btnParselSorgu" class="btn btn-tkgm" target="_blank" style="font-size: 12px; padding: 7px 12px;">🗺️ Parsel Sorgu'da Aç</a>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <a id="btnParselSorgu" class="btn btn-tkgm" target="_blank" style="font-size: 12px; padding: 7px 10px;">🗺️ Parsel Sorgu'da Aç</a>
+                <button class="btn btn-warning" style="font-size: 12px; padding: 7px 10px;" onclick="openEditFieldModal()">✏️ Düzenle</button>
                 <button class="btn btn-danger" style="padding: 7px 10px; font-size: 12px;" onclick="deleteCurrentField()">Sil</button>
                 <button class="modal-close" onclick="closeFieldDetailModal()">&times;</button>
             </div>
@@ -573,6 +719,164 @@
         window.currentSelectedFieldId = null;
     }
 
+    // TARLA DÜZENLEME
+    function openEditFieldModal() {
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+
+        document.getElementById('editFieldName').value = field.name;
+        document.getElementById('editFieldArea').value = field.area;
+        document.getElementById('editFieldCrop').value = field.crop;
+        document.getElementById('editFieldMapUrl').value = field.mapUrl || "";
+
+        document.getElementById('editFieldModal').classList.add('active');
+    }
+
+    function closeEditFieldModal() {
+        document.getElementById('editFieldModal').classList.remove('active');
+    }
+
+    function saveEditedField(e) {
+        e.preventDefault();
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+
+        field.name = document.getElementById('editFieldName').value;
+        field.area = parseFloat(document.getElementById('editFieldArea').value) || 0;
+        field.crop = document.getElementById('editFieldCrop').value;
+        field.mapUrl = document.getElementById('editFieldMapUrl').value.trim();
+
+        window.saveToCloud();
+        closeEditFieldModal();
+        openFieldDetail(field.id);
+    }
+
+    // SAHA İŞLEMİ DÜZENLEME
+    function openEditOpModal(opId) {
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+        const op = (field.operations || []).find(o => o.id === opId);
+        if(!op) return;
+
+        document.getElementById('editOpId').value = op.id;
+        document.getElementById('editOpDate').value = op.date;
+        document.getElementById('editOpSeedType').value = op.seedType === '-' ? '' : op.seedType;
+        document.getElementById('editOpSeedPerDa').value = op.seedPerDa || '';
+        document.getElementById('editOpFertType').value = op.fertType === '-' ? '' : op.fertType;
+        document.getElementById('editOpFertPerDa').value = op.fertPerDa || '';
+        document.getElementById('editOpLiquidFert').value = op.liquidFert === '-' ? '' : op.liquidFert;
+        document.getElementById('editOpPesticide').value = op.pesticide === '-' ? '' : op.pesticide;
+
+        document.getElementById('editOpModal').classList.add('active');
+    }
+
+    function closeEditOpModal() {
+        document.getElementById('editOpModal').classList.remove('active');
+    }
+
+    function saveEditedOp(e) {
+        e.preventDefault();
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+
+        const opId = parseInt(document.getElementById('editOpId').value);
+        const op = (field.operations || []).find(o => o.id === opId);
+        if(!op) return;
+
+        op.date = document.getElementById('editOpDate').value;
+        op.seedType = document.getElementById('editOpSeedType').value || '-';
+        op.seedPerDa = parseFloat(document.getElementById('editOpSeedPerDa').value) || 0;
+        op.fertType = document.getElementById('editOpFertType').value || '-';
+        op.fertPerDa = parseFloat(document.getElementById('editOpFertPerDa').value) || 0;
+        op.liquidFert = document.getElementById('editOpLiquidFert').value || '-';
+        op.pesticide = document.getElementById('editOpPesticide').value || '-';
+
+        window.saveToCloud();
+        closeEditOpModal();
+        window.renderFieldDetails(field);
+    }
+
+    // FİNANS İŞLEMİ DÜZENLEME
+    function handleEditFinanceTypeChange() {
+        const type = document.getElementById('editFinType').value;
+        const catSelect = document.getElementById('editFinCategory');
+        catSelect.innerHTML = "";
+
+        const list = type === "Gelir" ? incomeCategories : expenseCategories;
+        list.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c;
+            opt.innerText = c;
+            catSelect.appendChild(opt);
+        });
+
+        handleEditCategoryChange();
+    }
+
+    function handleEditCategoryChange() {
+        const type = document.getElementById('editFinType').value;
+        const category = document.getElementById('editFinCategory').value;
+        const isCropSale = (type === "Gelir" && category === "Mahsul Satışı");
+
+        document.getElementById('groupEditCropKg').style.display = isCropSale ? "grid" : "none";
+    }
+
+    function calculateEditCropTotal() {
+        const kg = parseFloat(document.getElementById('editFinCropKg').value) || 0;
+        const price = parseFloat(document.getElementById('editFinCropPrice').value) || 0;
+        if (kg > 0 && price > 0) {
+            document.getElementById('editFinAmount').value = (kg * price).toFixed(2);
+        }
+    }
+
+    function openEditFinModal(finId) {
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+        const fin = (field.finances || []).find(f => f.id === finId);
+        if(!fin) return;
+
+        document.getElementById('editFinId').value = fin.id;
+        document.getElementById('editFinDate').value = fin.date;
+        document.getElementById('editFinType').value = fin.type;
+
+        handleEditFinanceTypeChange();
+        document.getElementById('editFinCategory').value = fin.category;
+        handleEditCategoryChange();
+
+        document.getElementById('editFinCropKg').value = fin.cropKg || '';
+        document.getElementById('editFinCropPrice').value = fin.cropPrice || '';
+        document.getElementById('editFinDesc').value = fin.desc || '';
+        document.getElementById('editFinAmount').value = fin.amount || '';
+
+        document.getElementById('editFinModal').classList.add('active');
+    }
+
+    function closeEditFinModal() {
+        document.getElementById('editFinModal').classList.remove('active');
+    }
+
+    function saveEditedFin(e) {
+        e.preventDefault();
+        const field = window.farmData.find(f => f.id === window.currentSelectedFieldId);
+        if(!field) return;
+
+        const finId = parseInt(document.getElementById('editFinId').value);
+        const fin = (field.finances || []).find(f => f.id === finId);
+        if(!fin) return;
+
+        fin.date = document.getElementById('editFinDate').value;
+        fin.type = document.getElementById('editFinType').value;
+        fin.category = document.getElementById('editFinCategory').value;
+        fin.cropKg = parseFloat(document.getElementById('editFinCropKg').value) || 0;
+        fin.cropPrice = parseFloat(document.getElementById('editFinCropPrice').value) || 0;
+        fin.desc = document.getElementById('editFinDesc').value;
+        fin.amount = parseFloat(document.getElementById('editFinAmount').value) || 0;
+
+        window.saveToCloud();
+        closeEditFinModal();
+        window.renderFieldDetails(field);
+    }
+
     window.renderFieldDetails = function(field) {
         let income = (field.finances || []).filter(f => f.type === "Gelir").reduce((s, i) => s + i.amount, 0);
         let expense = (field.finances || []).filter(f => f.type === "Gider").reduce((s, i) => s + i.amount, 0);
@@ -591,11 +895,16 @@
             : field.operations.map(o => `
             <tr>
                 <td>${o.date}</td>
-                <td>${o.seedType ? `<strong>${o.seedType}</strong> (${o.seedPerDa} kg/da | ${(o.seedPerDa * field.area).toFixed(0)} kg)` : '-'}</td>
-                <td>${o.fertType ? `<strong>${o.fertType}</strong> (${o.fertPerDa} kg/da | ${(o.fertPerDa * field.area).toFixed(0)} kg)` : '-'}</td>
+                <td>${o.seedType !== '-' ? `<strong>${o.seedType}</strong> (${o.seedPerDa} kg/da | ${(o.seedPerDa * field.area).toFixed(0)} kg)` : '-'}</td>
+                <td>${o.fertType !== '-' ? `<strong>${o.fertType}</strong> (${o.fertPerDa} kg/da | ${(o.fertPerDa * field.area).toFixed(0)} kg)` : '-'}</td>
                 <td>${o.liquidFert || '-'}</td>
                 <td>${o.pesticide || '-'}</td>
-                <td><button class="btn btn-danger" style="padding: 3px 6px; font-size: 11px;" onclick="deleteFieldOp(${o.id})">Sil</button></td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="openEditOpModal(${o.id})">✏️</button>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteFieldOp(${o.id})">Sil</button>
+                    </div>
+                </td>
             </tr>
         `).join('');
 
@@ -610,7 +919,12 @@
                     <td>${f.cropKg > 0 ? `${(f.cropKg / 1000).toFixed(1)} Ton (${f.cropPrice} ₺/kg)` : '-'}</td>
                     <td>${f.desc}</td>
                     <td><strong>${f.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</strong></td>
-                    <td><button class="btn btn-danger" style="padding: 3px 6px; font-size: 11px;" onclick="deleteFieldFin(${f.id})">Sil</button></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="openEditFinModal(${f.id})">✏️</button>
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteFieldFin(${f.id})">Sil</button>
+                        </div>
+                    </td>
                 </tr>
             `).join('');
     };
@@ -633,12 +947,12 @@
         const newOp = {
             id: Date.now(),
             date: document.getElementById('opDate').value,
-            seedType: document.getElementById('opSeedType').value,
+            seedType: document.getElementById('opSeedType').value || '-',
             seedPerDa: parseFloat(document.getElementById('opSeedPerDa').value) || 0,
-            fertType: document.getElementById('opFertType').value,
+            fertType: document.getElementById('opFertType').value || '-',
             fertPerDa: parseFloat(document.getElementById('opFertPerDa').value) || 0,
-            liquidFert: document.getElementById('opLiquidFert').value,
-            pesticide: document.getElementById('opPesticide').value
+            liquidFert: document.getElementById('opLiquidFert').value || '-',
+            pesticide: document.getElementById('opPesticide').value || '-'
         };
 
         field.operations.unshift(newOp);
